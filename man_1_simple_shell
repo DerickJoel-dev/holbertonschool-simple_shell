@@ -1,0 +1,39 @@
+# NAME
+
+simpleshell - A simple shell program
+
+# SYNOPSIS
+
+**simpleshell**
+
+# DESCRIPTION
+
+`simpleshell` is a basic Unix shell program that allows users to execute commands and display the environment variables.
+
+# USAGE
+
+To use `simpleshell`, simply run the program. You will be presented with a command prompt where you can enter commands.
+
+- To execute a command, type it and press Enter.
+- To exit the shell, type "exit" and press Enter.
+- To display environment variables, type "env" and press Enter.
+
+# EXAMPLES
+
+$ simpleshell
+simpleshell$ ls
+file1.txt file2.txt
+
+simpleshell$ env
+PATH=/usr/local/bin:/usr/bin:/bin
+HOME=/home/user
+
+simpleshell$ exit
+$
+
+# AUTHORS
+
+- Derick Quinones
+
+See the "AUTHORS" file for details.
+
