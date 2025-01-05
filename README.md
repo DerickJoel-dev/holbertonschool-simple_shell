@@ -50,10 +50,10 @@ simpleshell$
 simpleshell$ cat test_ls_2 | ./hsh
 hsh main.c shell.c test_ls_2
 hsh main.c shell.c test_ls_2
-simpleshell$ 
+simpleshell$
 
 
-## Files 
+## Files
 - AUTHORS: contributors to the project.
  - execute.c: execute a command.
  - free_token.c: frees the array of tokens.
