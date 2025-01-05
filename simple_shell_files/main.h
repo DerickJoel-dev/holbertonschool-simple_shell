@@ -13,6 +13,7 @@ extern char **environ;
 
 int main(void);
 int execute(char *line_input);
+int handle_special_command(char *line_input);
 
 char **tokenize(char *line);
 char **tokenize_path(char *p);

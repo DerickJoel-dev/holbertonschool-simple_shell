@@ -3,8 +3,8 @@
 /**
  * main - Entry point
  *
- * Return: 0 (On success) or -1 (on error)
- */
+ * Return: 0 (on success) or -1 (on error)
+*/
 
 int main(void)
 {
@@ -26,19 +26,23 @@ int main(void)
 				printf("\n");
 			break;
 		}
-
-		if (strcmp(line_input, "exit\n") == 0)
-			break;
-
-		if (strcmp(line_input, "env\n") == 0)
+		if (line_input[0] == '\n')
 		{
-			print_env();
+			free(line_input);
+			line_input = NULL;
+			continue;
+		}
+
+		if (handle_special_command(line_input))
+		{
+			free(line_input);
+			line_input = NULL;
 			continue;
 		}
 
 		ex = execute(line_input);
-		if (ex == -1)
-			perror("Execution error");
+		free(line_input);
+		line_input = NULL;
 	}
 
 	free(line_input);
