@@ -14,6 +14,9 @@ extern char **environ;
 int main(void);
 int execute(char *line_input);
 int handle_special_command(char *line_input);
+int process_interactive(void);
+int process_non_interactive(void);
+int process_command(char *line_input);
 
 char **tokenize(char *line);
 char **tokenize_path(char *p);

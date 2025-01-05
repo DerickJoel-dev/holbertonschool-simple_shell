@@ -1,50 +1,18 @@
 #include "main.h"
 
 /**
- * main - Entry point
+ * main - Entry point for the simple shell
  *
- * Return: 0 (on success) or -1 (on error)
-*/
-
+ * Return: 0 on success, or -1 on error.
+ */
 int main(void)
 {
-	char *line_input = NULL;
-	int ex = 0, r;
-	size_t bufsize = 0;
+	int ex = 0;
 
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			printf("simpleshell$ ");
+	if (!isatty(STDIN_FILENO))
+		ex = process_non_interactive();
+	else
+		ex = process_interactive();
 
-		signal(SIGINT, signal_handler);
-
-		r = getline(&line_input, &bufsize, stdin);
-		if (r == -1)
-		{
-			if (feof(stdin))
-				printf("\n");
-			break;
-		}
-		if (line_input[0] == '\n')
-		{
-			free(line_input);
-			line_input = NULL;
-			continue;
-		}
-
-		if (handle_special_command(line_input))
-		{
-			free(line_input);
-			line_input = NULL;
-			continue;
-		}
-
-		ex = execute(line_input);
-		free(line_input);
-		line_input = NULL;
-	}
-
-	free(line_input);
 	return (ex);
 }
