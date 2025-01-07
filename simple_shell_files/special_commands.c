@@ -8,23 +8,21 @@
  */
 int handle_special_command(char *line_input)
 {
-    if (strcmp(line_input, "exit\n") == 0)
-    {
-        free(line_input);
-        exit(0);
-    }
+	if (strcmp(line_input, "exit\n") == 0)
+	{
+		free(line_input);
+		exit(0);
+	}
 
-    if (strcmp(line_input, "env\n") == 0)
-    {
-        int i = 0;
-        while (environ[i] != NULL)
-        {
-            printf("%s\n", environ[i]);
-            i++;
-        }
-        return (1);
-    }
+	if (strcmp(line_input, "env\n") == 0)
+	{
+		int i;
 
-    return (0);
+		for (i = 0; environ[i] != NULL; i++)
+			printf("%s\n", environ[i]);
+		return (1);
+	}
+
+	return (0);
 }
 

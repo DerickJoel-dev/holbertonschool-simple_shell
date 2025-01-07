@@ -12,6 +12,9 @@
 extern char **environ;
 
 int main(void);
+char *clean_quotes(char *line_input);
+char *resolve_path(char **args);
+int run_command(char *path, char **args);
 int execute(char *line_input);
 int handle_special_command(char *line_input);
 int process_interactive(void);

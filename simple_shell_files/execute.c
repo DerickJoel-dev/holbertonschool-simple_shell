@@ -10,58 +10,26 @@ int execute(char *line_input)
 {
 	char **args = NULL;
 	char *path = NULL;
-	pid_t pid;
-	int status, exit_status = 0;
+	int exit_status = 0;
+
+	line_input = clean_quotes(line_input);
 
 	args = tokenize(line_input);
 	if (args == NULL)
 		return (-1);
 
-	if (line_input[0] == '/')
-		path = strdup(line_input);
-	else
-		path = get_path(args[0]);
-
+	path = resolve_path(args);
 	if (path == NULL)
 	{
 		fprintf(stderr, "./hsh: %s: No such file or directory\n", args[0]);
 		free_tokens(args);
-		args = NULL;
 		return (-1);
 	}
 
-	pid = fork();
-	if (pid < 0)
-	{
-		perror("fork");
-		free_tokens(args);
-		free(path);
-		args = NULL;
-		path = NULL;
-		return (-1);
-	}
-	else if (pid == 0)
-	{
-		if (execve(path, args, environ) == -1)
-		{
-			perror("./hsh");
-			free_tokens(args);
-			free(path);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		wait(&status);
-		if (WIFEXITED(status))
-			exit_status = WEXITSTATUS(status);
-	}
+	exit_status = run_command(path, args);
 
 	free_tokens(args);
 	free(path);
-	args = NULL;
-	path = NULL;
-
 	return (exit_status);
 }
 
