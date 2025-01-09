@@ -7,6 +7,6 @@ void signal_handler(int signal)
 {
 	if (signal == SIGINT)
 	{
-		printf("\nsimpleshell$ ");
+		printf("\n#cisfun$ ");
 	}
 }

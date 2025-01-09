@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Running test suite for simple_shell"
+echo "Running test suite for #cisfun"
 
 echo "Test 1: /bin/ls"
 echo "/bin/ls" | ./hsh

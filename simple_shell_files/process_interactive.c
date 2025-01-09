@@ -14,7 +14,7 @@ int process_interactive(void)
 
 	while (1)
 	{
-		printf("simpleshell$ ");
+		printf("#cisfun$ ");
 		signal(SIGINT, signal_handler);
 
 		r = getline(&line_input, &bufsize, stdin);
