@@ -1,4 +1,3 @@
-
 # Simple Shell
 
 The shell is like a program that recieves command inputs from the user's keyboard and sends them to a machine to be executed by the kernel.
@@ -60,6 +59,13 @@ simpleshell$
  - main.h: header file.
  - path.c: functions related to path.
  - tokenize.c: tokenize input.
+ - process_command.c: path related.
+ - process_interactive.c: handles the interactive mode of the shell.
+ -  process_non_interactive.c: handles the non-interactive mode of the shell.
+ - path_helpers.c: path related.
+ - execution_helpers.c: handle fork and execute command.
+ - clean_helpers.c: removes surrounding quotes from input.
+ - special_command.c: handles exit and env.
 ## Functions
   - exit
    - execve
@@ -79,3 +85,4 @@ simpleshell$
    - wait
 ## Conclusion
 This is a basic Unix-like shell program called **simpleshell**. It provides a simple command-line interface for executing commands and displaying environment variables. Building a simple shell in C involves understanding how to parse and execute commands, handle user input and output, and manage processes using system calls like fork and execve. The process of creating a shell requires a deep understanding of C programming language and the Unix operating system.
+
