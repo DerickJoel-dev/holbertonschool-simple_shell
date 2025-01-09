@@ -4,32 +4,36 @@
  * execute - Executes a command
  * @line_input: Line input from the user
  *
- * Return: exit_status (0 on success, or -1 on error)
+ * Return: 0 on success, or -1 on error
  */
 int execute(char *line_input)
 {
-	char **args = NULL;
-	char *path = NULL;
-	int exit_status = 0;
-
-	line_input = clean_quotes(line_input);
-
-	args = tokenize(line_input);
-	if (args == NULL)
-		return (-1);
-
-	path = resolve_path(args);
-	if (path == NULL)
+	char *args[2]; /* Array for command and NULL terminator */
+	pid_t pid;
+	int status;
+	
+	args[0] = strtok(line_input, "\n"); /* Remove newline character */
+	args[1] = NULL; /* Null-terminate the arguments array */
+	
+	pid = fork();
+	if (pid < 0) /* Fork failed */
 	{
-		fprintf(stderr, "./hsh: %s: No such file or directory\n", args[0]);
-		free_tokens(args);
-		return (-1);
+	   	perror("fork error");
+	   	return (-1);
+	}
+	else if (pid == 0) /* Child process */
+	{
+		if (execve(args[0], args, environ) == -1)
+		{
+			perror("execve error");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else /* Parent process */
+	{
+		wait(&status); /* Wait for child to finish */
 	}
 
-	exit_status = run_command(path, args);
-
-	free_tokens(args);
-	free(path);
-	return (exit_status);
+	return (0);
 }
 

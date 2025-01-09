@@ -1,32 +1,18 @@
-#ifndef simpleshell
-#define simpleshell
+#ifndef SIMPLE_SHELL_H
+#define SIMPLE_SHELL_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
+/* Global environment variable */
 extern char **environ;
 
-int main(void);
-char *clean_quotes(char *line_input);
-char *resolve_path(char **args);
-int run_command(char *path, char **args);
+/* Prototypes */
 int execute(char *line_input);
-int handle_special_command(char *line_input);
-int process_interactive(void);
-int process_non_interactive(void);
-int process_command(char *line_input);
 
-char **tokenize(char *line);
-char **tokenize_path(char *p);
-char *get_path(char *cmd);
+#endif /* SIMPLE_SHELL_H */
 
-void print_env(void);
-void free_tokens(char **tokens);
-void signal_handler(int signal);
-
-#endif

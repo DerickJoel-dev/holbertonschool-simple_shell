@@ -3,16 +3,39 @@
 /**
  * main - Entry point for the simple shell
  *
- * Return: 0 on success, or -1 on error.
+ * Return: 0 on success, or -1 on error
  */
 int main(void)
 {
-	int ex = 0;
+	char *line_input = NULL;
+	size_t bufsize = 0;
+	ssize_t r;
 
-	if (!isatty(STDIN_FILENO))
-		ex = process_non_interactive();
-	else
-		ex = process_interactive();
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			printf("simpleshell$ ");
 
-	return (ex);
+		r = getline(&line_input, &bufsize, stdin);
+		if (r == -1) /** handles ctrl+D */
+		{
+			free(line_input);
+			if (feof(stdin))
+				exit(EXIT_SUCCESS);
+			perror("getline erro");
+			exit(EXIT_FAILURE);
+		}
+
+		if (strcmp(line_input, "exit\n") == 0) /** handle exit */
+		{
+			free(line_input);
+			exit(EXIT_SUCCESS);
+		}
+		if (execute(line_input) == -1)
+			perror("Execution error");
+
+		free(line_input);
+		line_input = NULL;
+	}
+	return (0);
 }
