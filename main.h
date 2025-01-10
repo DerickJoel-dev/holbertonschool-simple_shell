@@ -13,6 +13,7 @@ extern char **environ;
 
 /* Prototypes */
 int execute(char *line_input);
+char *_trim(char *str);
 
 #endif /* SIMPLE_SHELL_H */
 
