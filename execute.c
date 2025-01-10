@@ -1,24 +1,16 @@
 #include "main.h"
 
 /**
- * execute - Creates a child process to execute a command.
- * @args: Array of arguments for the command.
+ * execute - Executes a command with arguments.
+ * @args: Array of arguments, including the command.
+ *
+ * Description: Forks a child process to execute the command
+ *              using execve and waits for the child process.
  */
 void execute(char **args)
 {
     pid_t pid;
     int status;
-    char *cmd_path;
-
-    cmd_path = args[0];
-    if (access(cmd_path, X_OK) != 0) /* If not executable directly */
-        cmd_path = find_in_path(args[0]);
-
-    if (!cmd_path)
-    {
-        fprintf(stderr, "%s: command not found\n", args[0]);
-        return;
-    }
 
     pid = fork();
     if (pid == -1)
@@ -29,18 +21,17 @@ void execute(char **args)
 
     if (pid == 0)
     {
-        if (execve(cmd_path, args, NULL) == -1)
+        /* Child process: Execute the command */
+        if (execve(args[0], args, NULL) == -1)
         {
-            perror("execve");
+            perror(args[0]);
             exit(EXIT_FAILURE);
         }
     }
     else
     {
+        /* Parent process: Wait for child to complete */
         wait(&status);
     }
-
-    if (cmd_path != args[0])
-        free(cmd_path);
 }
 
