@@ -19,7 +19,6 @@ int main(void)
 		r = getline(&line_input, &bufsize, stdin);
 		if (r == -1) /** handles ctrl+D */
 		{
-			printf("\n");
 			free(line_input);
 			exit(EXIT_SUCCESS);
 		}

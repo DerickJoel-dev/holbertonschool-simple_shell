@@ -1,0 +1,10 @@
+AUTHORS
+execute.c
+hsh
+main.c
+main.h
+man_1_simple_shell
+output.txt
+README.md
+test_suite.sh
+
