@@ -19,11 +19,9 @@ int main(void)
 		r = getline(&line_input, &bufsize, stdin);
 		if (r == -1) /** handles ctrl+D */
 		{
+			printf("\n");
 			free(line_input);
-			if (feof(stdin))
-				exit(EXIT_SUCCESS);
-			perror("getline erro");
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		}
 
 		if (strcmp(line_input, "exit\n") == 0) /** handle exit */
