@@ -1,49 +1,52 @@
 #include "main.h"
 
 /**
- * main - Entry point for the simple shell
+ * main - Entry point
  *
- * Return: 0 on success, or -1 on error
- */
+ * Return: 0 (on success) or -1 (on error)
+*/
+
 int main(void)
 {
-    char *line_input = NULL;
-    size_t bufsize = 0;
-    ssize_t r;
+	char *line_input = NULL;
+	int ex = 0, r;
+	size_t bufsize = 0;
 
-    while (1)
-    {
-        if (isatty(STDIN_FILENO))
-            printf("simpleshell$ ");
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			printf("simpleshell$ ");
 
-        r = getline(&line_input, &bufsize, stdin);
-        if (r == -1) /* Handle Ctrl+D */
-        {
-            free(line_input);
-            exit(EXIT_SUCCESS);
-        }
+		signal(SIGINT, signal_handler);
 
-        line_input = trim_space(line_input);
+		r = getline(&line_input, &bufsize, stdin);
+		if (r == -1)
+		{
+			if (feof(stdin))
+			{
+				printf("\n");
+				free(line_input);
+				exit(EXIT_SUCCESS);
+			}
+			break;
+		}
+		if (strcmp(line_input, "exit\n") == 0)
+		{
+			free(line_input);
+			exit(EXIT_SUCCESS);
+		}
 
-        if (strlen(line_input) == 0) /* Skip empty commands */
-        {
-            free(line_input);
-            line_input = NULL;
-            continue;
-        }
+		if (strcmp(line_input, "env\n") == 0)
+		{
+			print_env();
+			free(line_input);
+			continue;
+		}
 
-        if (strcmp(line_input, "exit") == 0) /* Handle exit */
-        {
-            free(line_input);
-            exit(EXIT_SUCCESS);
-        }
-
-        if (execute(line_input) == -1)
-            perror("Execution error");
-
-        free(line_input);
-        line_input = NULL;
-    }
-    return (0);
+		ex = execute(line_input);
+		if (ex == -1)
+			perror("Execution Error");
+		free(line_input);
+	}
+	return (ex);
 }
-
