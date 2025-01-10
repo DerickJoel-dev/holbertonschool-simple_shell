@@ -1,31 +1,6 @@
 #include "main.h"
 
 /**
- * _trim - Removes leading and trailing spaces from a string
- * @str: The string to trim
- *
- * Return: Pointer to the trimmed string
- */
-char *_trim(char *str)
-{
-    char *end;
-
-    while (*str == ' ')
-        str++;
-
-    if (*str == '\0')
-        return str;
-
-    end = str + strlen(str) - 1;
-    while (end > str && *end == ' ')
-        end--;
-
-    *(end + 1) = '\0';
-
-    return str;
-}
-
-/**
  * main - Entry point for the simple shell
  *
  * Return: 0 on success, or -1 on error
@@ -33,7 +8,6 @@ char *_trim(char *str)
 int main(void)
 {
     char *line_input = NULL;
-    char *trimmed_input = NULL;
     size_t bufsize = 0;
     ssize_t r;
 
@@ -43,31 +17,33 @@ int main(void)
             printf("simpleshell$ ");
 
         r = getline(&line_input, &bufsize, stdin);
-        if (r == -1)
+        if (r == -1) /* Handle Ctrl+D */
         {
             free(line_input);
             exit(EXIT_SUCCESS);
         }
 
-        if (line_input[r - 1] == '\n')
-            line_input[r - 1] = '\0';
+        line_input = trim_space(line_input);
 
-        trimmed_input = _trim(line_input);
-
-        if (trimmed_input[0] == '\0')
+        if (strlen(line_input) == 0) /* Skip empty commands */
+        {
+            free(line_input);
+            line_input = NULL;
             continue;
+        }
 
-        if (strcmp(trimmed_input, "exit") == 0)
+        if (strcmp(line_input, "exit") == 0) /* Handle exit */
         {
             free(line_input);
             exit(EXIT_SUCCESS);
         }
 
-        if (execute(trimmed_input) == -1)
+        if (execute(line_input) == -1)
             perror("Execution error");
-    }
 
-    free(line_input);
+        free(line_input);
+        line_input = NULL;
+    }
     return (0);
 }
 

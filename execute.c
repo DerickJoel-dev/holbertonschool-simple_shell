@@ -1,48 +1,57 @@
 #include "main.h"
-#include <sys/stat.h>
 
 /**
  * execute - Executes a command
- * @command: Command to execute
+ * @line_input: Line input from the user
  *
  * Return: 0 on success, or -1 on error
  */
-int execute(char *command)
+int execute(char *line_input)
 {
-    char *args[2];
-    struct stat st;
+    char **args = tokenize(line_input);
+    char *path;
     pid_t pid;
     int status;
 
-    args[0] = command;
-    args[1] = NULL;
-
-    /* Cambio: Verificación de existencia y permisos */
-    if (stat(command, &st) == -1 || !(st.st_mode & S_IXUSR))
+    if (args == NULL || args[0] == NULL)
     {
-        fprintf(stderr, "%s: No such file or directory\n", command);
+        free(args);
+        return (-1);
+    }
+
+    path = get_path(args[0]);
+    if (path == NULL) /* Command not found */
+    {
+        fprintf(stderr, "%s: Command not found\n", args[0]);
+        free(args);
         return (-1);
     }
 
     pid = fork();
-    if (pid < 0)
+    if (pid < 0) /* Fork failed */
     {
-        perror("fork error");
+        perror("Fork error");
+        free(args);
+        free(path);
         return (-1);
     }
-    else if (pid == 0)
+    else if (pid == 0) /* Child process */
     {
-        if (execve(args[0], args, environ) == -1)
+        if (execve(path, args, environ) == -1)
         {
-            perror("execve error");
+            perror("Execve error");
+            free(args);
+            free(path);
             exit(EXIT_FAILURE);
         }
     }
-    else
+    else /* Parent process */
     {
         wait(&status);
     }
 
+    free(args);
+    free(path);
     return (0);
 }
 
