@@ -14,5 +14,6 @@ char **tokenize(char *line);
 void execute(char **args);
 char *find_in_path(char *command);
 int _strncmp(const char *s1, const char *s2, size_t n);
+char *expand_tilde(char *path);
 
 #endif /* MAIN_H */

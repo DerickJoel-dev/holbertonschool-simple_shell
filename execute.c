@@ -1,4 +1,5 @@
 #include "main.h"
+#include <limits.h>
 
 /**
  * execute - Executes a command with arguments.
@@ -8,13 +9,24 @@ void execute(char **args)
 {
     pid_t pid;
     int status;
-    char *cmd_path;
+    char *cmd_path = NULL;
+    char resolved_path[PATH_MAX];
+
+    if (args[0][0] == '~') /* Expand '~' to HOME directory */
+    {
+        char *expanded_path = expand_tilde(args[0]);
+        if (expanded_path)
+        {
+            free(args[0]);
+            args[0] = expanded_path;
+        }
+    }
 
     if (strchr(args[0], '/')) /* Command contains '/' */
     {
-        if (access(args[0], X_OK) == 0) /* File exists and is executable */
+        if (realpath(args[0], resolved_path) != NULL && access(resolved_path, X_OK) == 0)
         {
-            cmd_path = args[0]; /* Use the provided path */
+            cmd_path = strdup(resolved_path);
         }
         else
         {
@@ -24,12 +36,19 @@ void execute(char **args)
     }
     else /* Command does not contain '/', search in PATH */
     {
-        cmd_path = find_in_path(args[0]);
-        if (!cmd_path)
+        char *path_var = getenv("PATH");
+        if (!path_var || strlen(path_var) == 0) /* PATH is empty or undefined */
         {
             fprintf(stderr, "./shell: %s: command not found\n", args[0]);
             return;
         }
+        cmd_path = find_in_path(args[0]);
+    }
+
+    if (!cmd_path) /* Command not found */
+    {
+        fprintf(stderr, "./shell: %s: command not found\n", args[0]);
+        return;
     }
 
     pid = fork();
@@ -55,3 +74,4 @@ void execute(char **args)
     if (cmd_path != args[0]) /* Free memory if cmd_path was dynamically allocated */
         free(cmd_path);
 }
+
