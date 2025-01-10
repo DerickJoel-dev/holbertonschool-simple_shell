@@ -33,6 +33,7 @@ char *_trim(char *str)
 int main(void)
 {
     char *line_input = NULL;
+    char *trimmed_input = NULL;
     size_t bufsize = 0;
     ssize_t r;
 
@@ -51,27 +52,22 @@ int main(void)
         if (line_input[r - 1] == '\n')
             line_input[r - 1] = '\0';
 
-        line_input = _trim(line_input);
+        trimmed_input = _trim(line_input);
 
-        if (line_input[0] == '\0')
-        {
-            free(line_input);
-            line_input = NULL;
+        if (trimmed_input[0] == '\0')
             continue;
-        }
 
-        if (strcmp(line_input, "exit") == 0)
+        if (strcmp(trimmed_input, "exit") == 0)
         {
             free(line_input);
             exit(EXIT_SUCCESS);
         }
 
-        if (execute(line_input) == -1)
+        if (execute(trimmed_input) == -1)
             perror("Execution error");
-
-        free(line_input);
-        line_input = NULL;
     }
+
+    free(line_input);
     return (0);
 }
 
