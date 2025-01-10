@@ -22,8 +22,17 @@ int main(void)
 			free(line_input);
 			exit(EXIT_SUCCESS);
 		}
+		if (line_input[r - 1] == '\n')
+			line_input[r - 1] = '\0';
 
-		if (strcmp(line_input, "exit\n") == 0) /** handle exit */
+		if (line_input[0] == '\0')
+		{
+			free(line_input);
+			line_input = NULL;
+			continue;
+		}
+
+		if (strcmp(line_input, "exit") == 0) /** handle exit */
 		{
 			free(line_input);
 			exit(EXIT_SUCCESS);
