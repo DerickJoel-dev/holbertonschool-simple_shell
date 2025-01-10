@@ -1,5 +1,7 @@
 #include "main.h"
 
+extern char **environ; /* Declare the environ variable */
+
 /**
  * find_in_path - Searches for a command in the directories listed in PATH.
  * @command: The command to search for.
@@ -8,11 +10,22 @@
  */
 char *find_in_path(char *command)
 {
-    char *path = getenv("PATH");
-    char *dir, *full_path;
-    size_t cmd_len;
+    char *path = NULL, *dir = NULL, *full_path = NULL;
+    size_t cmd_len, dir_len;
+    int i = 0;
 
-    if (!path || !command)
+    /* Search for the PATH variable in environ */
+    while (environ[i])
+    {
+        if (_strncmp(environ[i], "PATH=", 5) == 0)
+        {
+            path = environ[i] + 5; /* Skip "PATH=" */
+            break;
+        }
+        i++;
+    }
+
+    if (!path) /* If PATH is not found */
         return (NULL);
 
     cmd_len = strlen(command);
@@ -21,7 +34,8 @@ char *find_in_path(char *command)
 
     while (dir)
     {
-        full_path = malloc(strlen(dir) + cmd_len + 2); /* +2 for '/' and '\0' */
+        dir_len = strlen(dir);
+        full_path = malloc(dir_len + cmd_len + 2); /* +2 for '/' and '\0' */
         if (!full_path)
         {
             free(path);
@@ -41,5 +55,26 @@ char *find_in_path(char *command)
 
     free(path);
     return (NULL);
+}
+
+/**
+ * _strncmp - Custom implementation of strncmp.
+ * @s1: First string.
+ * @s2: Second string.
+ * @n: Number of bytes to compare.
+ *
+ * Return: 0 if strings are equal, non-zero otherwise.
+ */
+int _strncmp(const char *s1, const char *s2, size_t n)
+{
+    size_t i;
+
+    for (i = 0; i < n; i++)
+    {
+        if (s1[i] != s2[i] || s1[i] == '\0' || s2[i] == '\0')
+            return (s1[i] - s2[i]);
+    }
+
+    return (0);
 }
 
