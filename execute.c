@@ -3,14 +3,23 @@
 /**
  * execute - Executes a command with arguments.
  * @args: Array of arguments, including the command.
- *
- * Description: Forks a child process to execute the command
- *              using execve and waits for the child process.
  */
 void execute(char **args)
 {
     pid_t pid;
     int status;
+    char *cmd_path;
+
+    if (access(args[0], X_OK) == 0) /* Command given with full path */
+        cmd_path = args[0];
+    else /* Search in PATH */
+        cmd_path = find_in_path(args[0]);
+
+    if (!cmd_path) /* Command not found */
+    {
+        fprintf(stderr, "./shell: %s: command not found\n", args[0]);
+        return;
+    }
 
     pid = fork();
     if (pid == -1)
@@ -19,19 +28,20 @@ void execute(char **args)
         exit(EXIT_FAILURE);
     }
 
-    if (pid == 0)
+    if (pid == 0) /* Child process */
     {
-        /* Child process: Execute the command */
-        if (execve(args[0], args, NULL) == -1)
+        if (execve(cmd_path, args, NULL) == -1)
         {
             perror(args[0]);
             exit(EXIT_FAILURE);
         }
     }
-    else
+    else /* Parent process */
     {
-        /* Parent process: Wait for child to complete */
         wait(&status);
     }
+
+    if (cmd_path != args[0]) /* Free memory if cmd_path was dynamically allocated */
+        free(cmd_path);
 }
 
