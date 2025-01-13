@@ -1,5 +1,6 @@
 #include "main.h"
-#include <limits.h>
+
+extern char **environ;      /* Declaración de la variable global con las variables de entorno */
 
 /**
  * execute - Executes a command with arguments.
@@ -7,71 +8,69 @@
  */
 void execute(char **args)
 {
-    pid_t pid;
-    int status;
-    char *cmd_path = NULL;
-    char resolved_path[PATH_MAX];
+    pid_t pid;              /* ID del proceso hijo */
+    int status;             /* Estado del proceso hijo */
+    char *cmd_path = NULL;  /* Ruta completa del comando a ejecutar */
 
-    if (args[0][0] == '~') /* Expand '~' to HOME directory */
+    /* Built-in: env */
+    if (strcmp(args[0], "env") == 0) /* Verifica si el comando es 'env' */
     {
-        char *expanded_path = expand_tilde(args[0]);
-        if (expanded_path)
-        {
-            free(args[0]);
-            args[0] = expanded_path;
-        }
+        int i;
+		for (i = 0; environ[i]; i++)
+            printf("%s\n", environ[i]);
+        return;
     }
 
-    if (strchr(args[0], '/')) /* Command contains '/' */
+    /* Built-in: exit */
+    if (strcmp(args[0], "exit") == 0) /* Verifica si el comando es 'exit' */
     {
-        if (realpath(args[0], resolved_path) != NULL && access(resolved_path, X_OK) == 0)
-        {
-            cmd_path = strdup(resolved_path);
-        }
+        free(args);      /* Libera la memoria asignada a args */
+        exit(0);         /* Termina el programa con código de salida 0 */
+    }
+
+    /* Manejo de comandos con rutas absolutas o relativas */
+    if (strchr(args[0], '/')) /* Verifica si el comando contiene '/' */
+    {
+        if (access(args[0], X_OK) == 0)         /* Verifica si el comando es ejecutable */
+            cmd_path = strdup(args[0]);         /* Duplica la ruta para usarla más adelante */
         else
         {
             fprintf(stderr, "./shell: %s: No such file or directory\n", args[0]);
-            return;
+            return; /* Imprime un error si el archivo no existe o no es accesible */
         }
     }
-    else /* Command does not contain '/', search in PATH */
+    else
     {
-        char *path_var = getenv("PATH");
-        if (!path_var || strlen(path_var) == 0) /* PATH is empty or undefined */
+        /* Buscar el comando en PATH */
+        cmd_path = find_in_path(args[0]); /* Busca el comando en las rutas definidas en PATH */
+        if (!cmd_path) /* Si el comando no se encuentra, muestra un mensaje de error */
         {
             fprintf(stderr, "./shell: %s: command not found\n", args[0]);
             return;
         }
-        cmd_path = find_in_path(args[0]);
     }
 
-    if (!cmd_path) /* Command not found */
+    /* Crear un proceso hijo para ejecutar el comando */
+    pid = fork(); /* Crea un nuevo proceso */
+    if (pid == -1) /* Si ocurre un error al crear el proceso hijo */
     {
-        fprintf(stderr, "./shell: %s: command not found\n", args[0]);
-        return;
+        perror("fork");  /* Muestra un mensaje de error */
+        exit(EXIT_FAILURE); /* Termina el programa */
     }
 
-    pid = fork();
-    if (pid == -1)
+    if (pid == 0) /* Proceso hijo */
     {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
-
-    if (pid == 0) /* Child process */
-    {
-        if (execve(cmd_path, args, NULL) == -1)
+        if (execve(cmd_path, args, environ) == -1) /* Ejecuta el comando en el proceso hijo */
         {
-            perror(args[0]);
-            exit(EXIT_FAILURE);
+            perror(args[0]); /* Si execve falla, imprime un mensaje de error */
+            exit(EXIT_FAILURE); /* Termina el proceso hijo con un error */
         }
     }
-    else /* Parent process */
+    else /* Proceso padre */
     {
-        wait(&status);
+        wait(&status); /* Espera a que el proceso hijo termine */
     }
 
-    if (cmd_path != args[0]) /* Free memory if cmd_path was dynamically allocated */
-        free(cmd_path);
+    free(cmd_path); /* Libera la memoria asignada a cmd_path */
 }
 
